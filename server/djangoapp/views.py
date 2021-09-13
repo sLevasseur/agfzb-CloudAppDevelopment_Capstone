@@ -44,6 +44,7 @@ def login_request(request):
             return render(request, 'djangoapp/index.html', context)
         else:
             # If not, return to login page again
+            context["message"] = "Bad inputs :\ "
             return render(request, 'djangoapp/login.html', context)
     else:
         return render(request, 'djangoapp/index.html', context)
@@ -55,7 +56,7 @@ def logout_request(request):
     # Logout user in the request
     logout(request)
     # Redirect user back to course list view
-    return render(request, 'djangoapp/index.html', context)
+    return render(request, 'djangoapp/index.html')
 
 # Create a `registration_request` view to handle sign up request
 def registration_request(request):
@@ -84,9 +85,10 @@ def registration_request(request):
             user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name,
                                             password=password)
             # Login the user and redirect to course list page
+            context["message"] = f"Signed in sucessfully {username} !"
             return render(request, 'djangoapp/login.html', context)
         else:
-            context["user_exist"] = "You are already signed up !"
+            context["message"] = "You are already signed up !"
             return render(request, 'djangoapp/registration.html', context)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
