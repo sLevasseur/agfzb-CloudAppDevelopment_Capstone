@@ -84,8 +84,7 @@ def registration_request(request):
             user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name,
                                             password=password)
             # Login the user and redirect to course list page
-            login(request, user)
-            return render(request, 'djangoapp/index.html', context)
+            return render(request, 'djangoapp/login.html', context)
         else:
             context["user_exist"] = "You are already signed up !"
             return render(request, 'djangoapp/registration.html', context)
