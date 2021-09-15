@@ -60,10 +60,10 @@ def get_dealer_reviews_from_cf(url, **kwargs):
         for review_details in review:
             # Create a CarDealer object with values in `doc` object
             review_obj = DealerReview(dealership=review_details["dealership"], name=review_details["name"], purchase=review_details["purchase"],
-                                   review=review_details["review"], pourchase_date=review_details["pourchase_date"], car_make=review_details["car_make"],
-                                   car_model=review_details["car_model"], car_year=review_details["car_year"], sentiment=review_details["sentiment"],
+                                   review=review_details["review"], purchase_date=review_details["purchase_date"], car_make=review_details["car_make"],
+                                   car_model=review_details["car_model"], car_year=review_details["car_year"], sentiment="positive" """review_details["sentiment"]""",
                                    id=review_details["id"])
-            results.append(dealer_obj)
+            results.append(review_obj)
 
     return results
 
@@ -72,6 +72,20 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
+def analyze_review_sentiments():
+    analyze = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
+                                    auth=HTTPBasicAuth('apikey', api_key))
+    url = "https://api.eu-gb.natural-language-understanding.watson.cloud.ibm.com/instances/c7891e80-feb9-4c3a-9fa8-de964fc1e3da"
+    api_key = "y1ciM6i9d1M5CM39Y1QlaL-y6L7fyNaiiSKNI60HnD47"
+    params = {
+                "text": "Total grid-enabled service-desk",
+                "features": {
+                    "sentiment": "document"
+                }
+                }
+    data = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
+                                    auth=HTTPBasicAuth('apikey', api_key))
 
+    return data
 
-
+    print(analyze_review_sentiments)
