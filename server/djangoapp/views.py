@@ -99,14 +99,16 @@ def get_dealerships(request):
     
     username = data["COUCH_USERNAME"]
     apikey = data ["IAM_API_KEY"]
+    context = {}
     if request.method == "GET":
         url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/dealership?COUCH_USERNAME={username}&IAM_API_KEY={apikey}"
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
+        context=["dealership_list"] = dealerships
         # Concat all dealer's short name
         dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
         # Return a list of dealer short name
-        return HttpResponse(dealer_names)
+        return render(request, 'djangoapp/index.html', context)
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 def get_dealer_details(request, dealer_id):
@@ -115,7 +117,7 @@ def get_dealer_details(request, dealer_id):
     
     username = data["COUCH_USERNAME"]
     apikey = data ["IAM_API_KEY"]
-
+    context = {}
     if request.method == "GET":
         url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/review?COUCH_USERNAME={username}&IAM_API_KEY={apikey}&dealerId={dealer_id}"
         # Get dealers from the URL
@@ -124,7 +126,9 @@ def get_dealer_details(request, dealer_id):
         list_reviews = ' '.join([info_review.review for info_review in reviews])
         sentiment_reviews = ' '.join([info_review.sentiment for info_review in reviews])
         # Return a list of dealer short name
-        return HttpResponse(f"{list_reviews} + {sentiment_reviews}")
+        context["review_list"] = review
+        context["dealer_id"] = dealer_id
+        return render(request, 'djangoapp/dealer_details.html', context).
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
@@ -135,12 +139,13 @@ def add_review(request, dealer_id):
     username = data["COUCH_USERNAME"]
     apikey = data ["IAM_API_KEY"]
     if request.method == "GET":
-        dealersid = dealer_id
+        dealer_id = dealer_id
         url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/review?COUCH_USERNAME={username}&IAM_API_KEY={apikey}&dealerId={dealer_id}"
         # Get dealers from the URL
         context = {
             "cars": models.CarModel.objects.all(),
-            "dealers": restapis.get_dealers_from_cf(url),
+            "dealers": get_dealers_from_cf(url),
+            "dealer_id": dealer_id
         }
         return render(request, 'djangoapp/add_review.html', context)
     if request.method == "POST":
@@ -162,7 +167,7 @@ def add_review(request, dealer_id):
             print (json_payload)
             url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/review?COUCH_USERNAME={username}&IAM_API_KEY={apikey}&dealerId={dealer_id}"
             restapis.post_request(url, json_payload)
-            return HttpResponse(f'review submitted : {json_payload}')
+            return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
         else:
-            return render(request, 'djangoapp/index.html', context)
+            return render(request, 'djangoapp/dealer_details.html', context)
 
