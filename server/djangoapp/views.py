@@ -2,13 +2,14 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-# from .models import related models
+from .models import CarDealer, DealerReview
 from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
 import logging
 import json
+import datetime
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -121,10 +122,47 @@ def get_dealer_details(request, dealer_id):
         reviews = get_dealer_reviews_from_cf(url)
         # Concat all dealer's short name
         list_reviews = ' '.join([info_review.review for info_review in reviews])
+        sentiment_reviews = ' '.join([info_review.sentiment for info_review in reviews])
         # Return a list of dealer short name
-        return HttpResponse(list_reviews)
+        return HttpResponse(f"{list_reviews} + {sentiment_reviews}")
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
-# ...
+def add_review(request, dealer_id):
+    with open ("../functions/.creds-sample.json", 'r') as creds:
+        data = json.load(creds)
+    
+    username = data["COUCH_USERNAME"]
+    apikey = data ["IAM_API_KEY"]
+    if request.method == "GET":
+        dealersid = dealer_id
+        url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/review?COUCH_USERNAME={username}&IAM_API_KEY={apikey}&dealerId={dealer_id}"
+        # Get dealers from the URL
+        context = {
+            "cars": models.CarModel.objects.all(),
+            "dealers": restapis.get_dealers_from_cf(url),
+        }
+        return render(request, 'djangoapp/add_review.html', context)
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            form = request.POST
+            review = {
+                "name": "{request.user.first_name} {request.user.last_name}",
+                "dealership": dealer_id,
+                "review": form["content"],
+                "purchase": form.get("purchasecheck"),
+                }
+            if form.get("purchasecheck"):
+                review["purchase_date"] = datetime.strptime(form.get("purchasedate"), "%m/%d/%Y").isoformat()
+                car = models.CarModel.objects.get(pk=form["car"])
+                review["car_make"] = car.carmake.name
+                review["car_model"] = car.name
+                review["car_year"]= car.year.strftime("%Y")
+            json_payload = {"review": review}
+            print (json_payload)
+            url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/review?COUCH_USERNAME={username}&IAM_API_KEY={apikey}&dealerId={dealer_id}"
+            restapis.post_request(url, json_payload)
+            return HttpResponse(f'review submitted : {json_payload}')
+        else:
+            return render(request, 'djangoapp/index.html', context)
 

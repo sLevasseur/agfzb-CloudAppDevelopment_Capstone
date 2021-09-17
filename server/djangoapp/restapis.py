@@ -2,7 +2,9 @@ import requests
 import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
-
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions
 
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
@@ -61,7 +63,7 @@ def get_dealer_reviews_from_cf(url, **kwargs):
             # Create a CarDealer object with values in `doc` object
             review_obj = DealerReview(dealership=review_details["dealership"], name=review_details["name"], purchase=review_details["purchase"],
                                    review=review_details["review"], purchase_date=review_details["purchase_date"], car_make=review_details["car_make"],
-                                   car_model=review_details["car_model"], car_year=review_details["car_year"], sentiment="positive" """review_details["sentiment"]""",
+                                   car_model=review_details["car_model"], car_year=review_details["car_year"], sentiment=analyze_review_sentiments(review_details["review"]),
                                    id=review_details["id"])
             results.append(review_obj)
 
@@ -72,20 +74,31 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
-def analyze_review_sentiments():
-    analyze = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
-                                    auth=HTTPBasicAuth('apikey', api_key))
+def analyze_review_sentiments(text):
     url = "https://api.eu-gb.natural-language-understanding.watson.cloud.ibm.com/instances/c7891e80-feb9-4c3a-9fa8-de964fc1e3da"
     api_key = "y1ciM6i9d1M5CM39Y1QlaL-y6L7fyNaiiSKNI60HnD47"
-    params = {
-                "text": "Total grid-enabled service-desk",
-                "features": {
-                    "sentiment": "document"
-                }
-                }
-    data = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
-                                    auth=HTTPBasicAuth('apikey', api_key))
+    texttoanalyze = text
+    authenticator = IAMAuthenticator(api_key)
+    natural_language_understanding = NaturalLanguageUnderstandingV1(
+        version='2020-08-01',
+        authenticator=authenticator
+    )
+    natural_language_understanding.set_service_url(url)
 
-    return data
+    response = natural_language_understanding.analyze(
+        text=texttoanalyze,
+        features=Features(sentiment=SentimentOptions())).get_result()
 
-    print(analyze_review_sentiments)
+    sentiment = json.dumps(response["sentiment"]["document"]["label"])
+
+    return sentiment
+
+def post_request(url, json_payload, **kwargs):
+    json_obj = json_payload["review"]
+    print(kwargs)
+    try:
+        response = requests.post(url, json=json_obj, params=kwargs)
+    except:
+        print("Something went wrong")
+    print (response)
+    return response
