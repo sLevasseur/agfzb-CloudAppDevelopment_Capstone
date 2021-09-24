@@ -22,7 +22,7 @@
                     <li>
                         <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
                         <a class="btn btn-link" href="/djangoapp/logout/">Logout</a>
-                        <a class="btn btn-link" href="/djangoapp/review/{{dealer_id}}">Add review</a>
+                        <a class="btn btn-link" href="/djangoapp/dealer/review/{{dealer_id}}/add_review/">Add your review !</a>
                     </li>
                     {% else %}
                     <li>
@@ -41,9 +41,11 @@
             </div>
         </nav>
     <!-- Add reviews as cards -->
-
-    <div class="card-columns">
-        {% for review in review_list %}
+    <h3>Reviews for {{reviews.dealership}}</h3>
+    <br>
+    <main class="container" style="padding: 3%;">
+        <div class="card-columns">
+            {% for review in reviews %}
                 <div class="card" style="height: 300px; overflow: scroll; overflow-x: hidden;">
                     <img src="{{MEDIA_URL}}/emoji/{{review.sentiment}}.png" class="card-img-center" style="height: 100px; width: 100px; margin-left: 35%; margin-bottom: 5%; margin-top: 2%;">
                     <div class="card-body" style="text-align: center;">
@@ -53,7 +55,8 @@
                     </div>
                 </div>
             {% endfor %}
-    </div>
+        </div>
+    </main>
     </body>
 
 </html>

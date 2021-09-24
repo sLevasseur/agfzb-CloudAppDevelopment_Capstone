@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
     <body>
-    <form action="{% url 'onlinecourse:registration' %}" method="post">
+    <form action="/djangoapp/registration/" method="post">
         <div class="container"> 
             {% csrf_token %}
             <h1>Sign Up</h1>

@@ -13,7 +13,7 @@ from django.utils.timezone import now
 class CarMake(models.Model):
     name = models.CharField(max_length=30)
     description = models.TextField()
-    date_created = models.DateField(auto_now=True)
+    date_created = models.DateField()
 
     def __str__(self):
         return f' {self.name} : {self.description}'
@@ -32,7 +32,7 @@ class CarModel(models.Model):
     car_make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
     dealer_id = models.IntegerField(help_text='refers to a dealer created in Cloudant database')
-    type = models.CharField(max_length=8, choices=MODEL_CHOICES, default=SUV)
+    type = models.CharField(max_length=9, choices=MODEL_CHOICES, default=SUV)
     year = models.DateField()
 
     def __str__(self):

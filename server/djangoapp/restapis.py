@@ -12,7 +12,6 @@ from ibm_watson.natural_language_understanding_v1 import Features, SentimentOpti
 
 def get_request(url, **kwargs):
     print(kwargs)
-    print("GET from {} ".format(url))
     try:
         # Call get method of requests library with URL and parameters
         response = requests.get(url, headers={'Content-Type': 'application/json'},
@@ -45,7 +44,7 @@ def get_dealers_from_cf(url, **kwargs):
                                    short_name=dealer_doc["short_name"],
                                    st=dealer_doc["st"], zip=dealer_doc["zip"])
             results.append(dealer_obj)
-
+            print(dealer_obj)
     return results
 
 
@@ -91,14 +90,14 @@ def analyze_review_sentiments(text):
 
     sentiment = json.dumps(response["sentiment"]["document"]["label"])
 
-    return sentiment
+    return sentiment.replace("\"", "")
 
 def post_request(url, json_payload, **kwargs):
     json_obj = json_payload["review"]
     print(kwargs)
     try:
-        response = requests.post(url, json=json_obj, params=kwargs)
+        response = requests.post(url, json=json_obj)
     except:
         print("Something went wrong")
-    print (response)
+    print(response.text)
     return response
