@@ -94,7 +94,7 @@ def registration_request(request):
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
-    with open("../functions/.creds-sample.json", 'r') as creds:
+    with open("./djangoapp/creds-sample.json", 'r') as creds:
         data = json.load(creds)
     
     username = data["COUCH_USERNAME"]
@@ -112,7 +112,7 @@ def get_dealerships(request):
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 def get_dealer_details(request, dealer_id):
-    with open ("../functions/.creds-sample.json", 'r') as creds:
+    with open("./djangoapp/creds-sample.json", 'r') as creds:
         data = json.load(creds)
     
     username = data["COUCH_USERNAME"]
@@ -130,7 +130,7 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 def add_review(request, dealer_id):
-    with open("../functions/.creds-sample.json", 'r') as creds:
+    with open("./djangoapp/creds-sample.json", 'r') as creds:
         data = json.load(creds)
     
     username = data["COUCH_USERNAME"]
