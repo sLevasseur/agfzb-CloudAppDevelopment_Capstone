@@ -1,4 +1,4 @@
 {
-    "COUCH_USERNAME": "6073b942-6dd0-444a-91dd-9b2f9dde5768-bluemix",
-    "IAM_API_KEY": "dq6oIgDSAJIMRrtXGYqrny7H-hh5lpNYeKW_j_1s3cO3"
+    "COUCH_USERNAME": "${{ secrets.COUCH_USERNAME }}",
+    "IAM_API_KEY": "${{ secrets.IAM_API_KEY }}"
 }
