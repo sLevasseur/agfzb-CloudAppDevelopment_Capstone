@@ -96,12 +96,10 @@ def registration_request(request):
 def get_dealerships(request):
     with open("./djangoapp/creds-sample.json", 'r') as creds:
         data = json.load(creds)
-    
-    username = data["COUCH_USERNAME"]
-    apikey = data["IAM_API_KEY"]
+
     context = {}
     if request.method == "GET":
-        url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/dealership?COUCH_USERNAME={username}&IAM_API_KEY={apikey}"
+        url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/dealership"
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
         context["dealership_list"] = dealerships
@@ -114,12 +112,10 @@ def get_dealerships(request):
 def get_dealer_details(request, dealer_id):
     with open("./djangoapp/creds-sample.json", 'r') as creds:
         data = json.load(creds)
-    
-    username = data["COUCH_USERNAME"]
-    apikey = data["IAM_API_KEY"]
+
     context = {}
     if request.method == "GET":
-        url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/review?COUCH_USERNAME={username}&IAM_API_KEY={apikey}&dealerId={dealer_id}"
+        url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/review?dealerId={dealer_id}"
         # Get dealers from the URL
         reviews = get_dealer_reviews_from_cf(url)
         # Concat all dealer's short name
@@ -132,13 +128,10 @@ def get_dealer_details(request, dealer_id):
 def add_review(request, dealer_id):
     with open("./djangoapp/creds-sample.json", 'r') as creds:
         data = json.load(creds)
-    
-    username = data["COUCH_USERNAME"]
-    apikey = data ["IAM_API_KEY"]
     context = {}
     if request.method == "GET":
         context["dealer_id"] = dealer_id
-        url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/dealership?COUCH_USERNAME={username}&IAM_API_KEY={apikey}&dealerId={dealer_id}"
+        url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/dealership?dealerId={dealer_id}"
         # Get dealers from the URL
         context = {
             "cars": CarModel.objects.all(),
@@ -163,7 +156,7 @@ def add_review(request, dealer_id):
                 review["car_year"]= car.year.strftime("%Y")
             json_payload = {"review": review}
             print(json_payload)
-            url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/review?COUCH_USERNAME={username}&IAM_API_KEY={apikey}&dealerId={dealer_id}"
+            url = f"https://9ad6410f.eu-gb.apigw.appdomain.cloud/api/review?dealerId={dealer_id}"
             post_request(url, json_payload)
             return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
         else:
